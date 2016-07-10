@@ -12,8 +12,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class PluginFiles {
 
-	public static String filepath = Main.instance.filepath;
-	public static File stagedir = new File(filepath + "Stage");
+	public static String filepath = Main.main.filepath;
+
 	/**
 	 * ファイルの保存
 	 *
@@ -21,21 +21,33 @@ public class PluginFiles {
 	 * @param file ファイル指定
 	 * @param save 上書きをするかリセットするか
 	 */
-	public static void SettingFiles(FileConfiguration fileconfiguration, File file, boolean save) {
-		if(!file.exists() || save) {
-			try {
-				fileconfiguration.save(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	public static void SettingFiles(FileConfiguration fileconfiguration, File file) {
+		try {
+			fileconfiguration.save(file);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static File StageFile(String name) {
-		File file = new File(filepath + "Stage" + File.separator + name +".yml");
+	/**
+	 * plugins/<プラグイン名>/
+	 * 以下の階層にあるディレクトリの中にあるYAMLファイルを取得
+	 *
+	 * @param dirname ディレクトリ名
+	 * @param name ファイル名
+	 *
+	 */
+	public static File DirFile(String dirname, String name) {
+		File file = new File(filepath + dirname + File.separator + name +".yml");
 		return file;
 	}
 
+	/**
+	 * 拡張子を抜いたファイル名を取得
+	 *
+	 * @param name 拡張子を含めたファイル名
+	 *
+	 */
 	private static String getName(String name) {
 		if (name == null)
 			return null;
@@ -45,6 +57,13 @@ public class PluginFiles {
 		return name;
 	}
 
+	/**
+	 * 指定したディレクトリにあるファイルのリストを取得
+	 * (フォルダは含まない)
+	 *
+	 * @param dir ファイルディレクトリ
+	 *
+	 */
 	public static List<String> getFileList(File dir) {
 		List<String> names = new ArrayList<>();
 		for(File file : Arrays.asList(dir.listFiles())) {
