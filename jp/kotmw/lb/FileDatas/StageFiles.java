@@ -1,5 +1,6 @@
 package jp.kotmw.lb.FileDatas;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -9,6 +10,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class StageFiles extends PluginFiles {
+
+	public static File stagedir = new File(filepath + "Stage");
+	public static String dirpath = "Stage";
 
 	public static List<String> getStageList() {
 		return getFileList(stagedir);
@@ -41,20 +45,29 @@ public class StageFiles extends PluginFiles {
 		file.set(stage +".Point2.x", x2);
 		file.set(stage +".Point2.y", y2);
 		file.set(stage +".Point2.z", z2);
-		SettingFiles(file, StageFile(stage), true);
+		SettingFiles(file, DirFile(dirpath, stage));
+	}
+
+	public static Location getStageLoc(String stage, int locnum) {
+		FileConfiguration file = YamlConfiguration.loadConfiguration(PluginFiles.DirFile(dirpath, stage));
+		String world = file.getString(stage+".World");
+		int x = file.getInt(stage+".Point"+locnum+".x");
+		int y = file.getInt(stage+".Point"+locnum+".y");
+		int z = file.getInt(stage+".Point"+locnum+".z");
+		return new Location(Bukkit.getWorld(world), x, y, z);
 	}
 
 	public static void setStayRoom(Location l, String stage) {
-		FileConfiguration file = YamlConfiguration.loadConfiguration(PluginFiles.StageFile(stage));
+		FileConfiguration file = YamlConfiguration.loadConfiguration(PluginFiles.DirFile(dirpath, stage));
 		file.set(stage+".Room.world", l.getWorld().getName());
 		file.set(stage+".Room.x", l.getX());
 		file.set(stage+".Room.y", l.getY());
 		file.set(stage+".Room.z", l.getZ());
-		PluginFiles.SettingFiles(file, PluginFiles.StageFile(stage), true);
+		PluginFiles.SettingFiles(file, PluginFiles.DirFile(dirpath, stage));
 	}
 
 	public static Location getStayRoom(String stage) {
-		FileConfiguration file = YamlConfiguration.loadConfiguration(StageFile(stage));
+		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(dirpath, stage));
 		String world = file.getString(stage+".Room.world");
 		double x = file.getDouble(stage+".Room.x");
 		double y = file.getDouble(stage+".Room.y");
@@ -63,7 +76,7 @@ public class StageFiles extends PluginFiles {
 	}
 
 	public static void setRespawn(Location l, String stage, int team, int nom) {
-		FileConfiguration file = YamlConfiguration.loadConfiguration(StageFile(stage));
+		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(dirpath, stage));
 		if(!file.contains(stage+".Team"+team))
 			file.set(stage+".TotalTeamNum", file.getInt(stage+".TotamTeamNum")+1);
 		file.set(stage+".Team"+team+".RespawnPoint", file.getInt(stage+".Team"+team+".RespawnPoint")+1);
@@ -71,13 +84,13 @@ public class StageFiles extends PluginFiles {
 		file.set(stage+".Team"+team+".loc"+nom+".x", l.getX());
 		file.set(stage+".Team"+team+".loc"+nom+".y", l.getY());
 		file.set(stage+".Team"+team+".loc"+nom+".z", l.getZ());
-		PluginFiles.SettingFiles(file, PluginFiles.StageFile(stage), true);
+		PluginFiles.SettingFiles(file, PluginFiles.DirFile(dirpath, stage));
 	}
 
 	public static Location getRespawn(int team, String stage) {
-		FileConfiguration file = YamlConfiguration.loadConfiguration(StageFile(stage));
+		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(dirpath, stage));
 		Random random = new Random();
-		int loc = random.nextInt(file.getInt(stage+".Team"+team+".RespawnPoint")) + 1;
+		int loc = random.nextInt(getRespawnPoint(stage, team)) + 1;
 		String world = file.getString(stage+".Team"+team+".loc"+loc+".world");
 		double x= file.getDouble(stage+".Team"+team+".loc"+loc+".x");
 		double y= file.getDouble(stage+".Team"+team+".loc"+loc+".y");
@@ -86,7 +99,12 @@ public class StageFiles extends PluginFiles {
 	}
 
 	public static int getTotalTeamNum(String stage) {
-		FileConfiguration file = YamlConfiguration.loadConfiguration(StageFile(stage));
+		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(dirpath, stage));
 		return file.getInt(stage+".TotalTeamNum");
+	}
+
+	public static int getRespawnPoint(String stage, int team) {
+		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(dirpath, stage));
+		return file.getInt(stage+".Team"+team+".RespawnPoint");
 	}
 }

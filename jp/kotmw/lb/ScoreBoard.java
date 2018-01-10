@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import jp.kotmw.lb.FileDatas.StageFiles;
+import jp.kotmw.lb.datas.PlayerData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.Team.Option;
+import org.bukkit.scoreboard.Team.OptionStatus;
 
 public class ScoreBoard {
 
@@ -46,28 +47,32 @@ public class ScoreBoard {
 		team.setSuffix(ChatColor.RESET.toString());
 		team.setAllowFriendlyFire(false);
 		team.setCanSeeFriendlyInvisibles(false);
-		team.setNameTagVisibility(NameTagVisibility.ALWAYS);
+		team.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.ALWAYS);
 		return team;
 	}
 
 	public static Team setTeam(String stage, PlayerData data, int teamid) {
 		Scoreboard sb = scoreboard.get(stage);
-		Team bteam = sb.getEntryTeam(data.getPlayer());
+		Team bteam = sb.getEntryTeam(data.getName());
 		Team team = sb.getTeam("LBTeam"+teamid);
 		if((bteam != null)
 				&& (!team.getName().equalsIgnoreCase(bteam.getName()))) {
-			bteam.removeEntry(data.getPlayer());
-			team.addEntry(data.getPlayer());
+			bteam.removeEntry(data.getName());
+			team.addEntry(data.getName());
 		} else if(bteam == null)
-			team.addEntry(data.getPlayer());
+			team.addEntry(data.getName());
 		data.setTeamId(teamid);
 		return team;
+	}
+
+	public static Scoreboard getScoreboard(PlayerData data) {
+		return scoreboard.get(data.getStage());
 	}
 
 	public static Team removeTeam(PlayerData data) {
 		Scoreboard sb = scoreboard.get(data.getStage());
 		Team team = sb.getTeam("LBTeam"+data.getTeamId());
-		team.removeEntry(data.getPlayer());
+		team.removeEntry(data.getName());
 		return team;
 	}
 
@@ -109,14 +114,14 @@ public class ScoreBoard {
 		return color;
 	}
 
-	public static Color getTeamLaserColor(int i) {
-		Color color = Color.RED;
-		if(i == 1) color=Color.RED;
-		else if(i == 2) color=Color.BLUE;
-		else if(i == 3) color=Color.TEAL;
-		else if(i == 4) color=Color.FUCHSIA;
-		else if(i == 5) color=Color.NAVY;
-		else if(i == 6) color=Color.GRAY;
+	public static WoolColorEnum getTeamLaserColor(int i) {
+		WoolColorEnum color = WoolColorEnum.RED;
+		if(i == 1) color=WoolColorEnum.RED;
+		else if(i == 2) color=WoolColorEnum.BLUE;
+		else if(i == 3) color=WoolColorEnum.TEAL;
+		else if(i == 4) color=WoolColorEnum.PINK;
+		else if(i == 5) color=WoolColorEnum.PURPLE;
+		else if(i == 6) color=WoolColorEnum.GRAY;
 		return color;
 	}
 }
